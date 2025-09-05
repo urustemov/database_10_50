@@ -1,0 +1,49 @@
+Script started on 2025-09-05 15:47:18+06:00 [TERM="xterm-256color" TTY="/dev/pts/0" COLUMNS="203" LINES="55"]
+]0;serdar@vostro: ~/Database/Labs[01;32mserdar@vostro[00m:[01;34m~/Database/Labs[00m$ exitsudo -i -u postgrescript -q lab-3.txtudo -i -u postgres
+[sudo] password for serdar: 
+postgres@vostro:~$ psql
+psql (12.22 (Ubuntu 12.22-0ubuntu0.20.04.4))
+Type "help" for help.
+
+postgres=# \c mydb
+You are now connected to database "mydb" as user "postgres".
+mydb=# \l
+                                  List of databases
+   Name    |  Owner   | Encoding |   Collate   |    Ctype    |   Access privileges   
+-----------+----------+----------+-------------+-------------+-----------------------
+ mydb      | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | 
+ postgres  | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | 
+ template0 | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | =c/postgres          +
+           |          |          |             |             | postgres=CTc/postgres
+ template1 | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | =c/postgres          +
+           |          |          |             |             | postgres=CTc/postgres
+(4 rows)
+
+mydb=# \dt
+Did not find any relations.
+mydb=# CREATE TABLE students (
+mydb(#     id SERIAL PRIMARY KEY,
+mydb(#     name VARCHAR(100),
+mydb(#     age INT
+mydb(# );
+CREATE TABLE
+mydb=# INSERT INTO students (name, age) VALUES ('Alice', 21), ('Bob', 23);
+INSERT 0 2
+mydb=# SELECT * FROM students;
+ id | name  | age 
+----+-------+-----
+  1 | Alice |  21
+  2 | Bob   |  23
+(2 rows)
+
+mydb=# DROP TABLE students;
+DROP TABLE
+mydb=# \dt
+Did not find any relations.
+mydb=# \q
+postgres@vostro:~$ ext[Kit
+logout
+]0;serdar@vostro: ~/Database/Labs[01;32mserdar@vostro[00m:[01;34m~/Database/Labs[00m$ exit
+exit
+
+Script done on 2025-09-05 15:47:43+06:00 [COMMAND_EXIT_CODE="0"]
