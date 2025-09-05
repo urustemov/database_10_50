@@ -1,0 +1,12 @@
+CREATE DATABASE
+You are now connected to database "lab5_db" as user "postgres".
+CREATE TABLE
+INSERT 0 2
+ id | name  
+----+-------
+  1 | Test1
+  2 | Test2
+(2 rows)
+
+You are now connected to database "postgres" as user "postgres".
+DROP DATABASE
