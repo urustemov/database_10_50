@@ -1,0 +1,3 @@
+"name","email"
+"Alymbek","alymbek@example.com"
+"Timur","timur@example.com"
