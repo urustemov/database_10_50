@@ -1,0 +1,128 @@
+serdar@vostro:~/Database$ cd labs
+bash: cd: labs: No such file or directory
+serdar@vostro:~/Database$ cd Labs
+serdar@vostro:~/Database/Labs$ ls
+lab03  lab04  lab05  lab06  lab07
+serdar@vostro:~/Database/Labs$ cd lab07
+serdar@vostro:~/Database/Labs/lab07$ psql -U postgres -d postgres | tee Labs/lab07/lab-7.txt
+tee: Labs/lab07/lab-7.txt: No such file or directory
+psql: error: FATAL:  Peer authentication failed for user "postgres"
+serdar@vostro:~/Database/Labs/lab07$ sudo -i -u postgres
+[sudo] password for serdar: 
+postgres@vostro:~$ psql
+psql (12.22 (Ubuntu 12.22-0ubuntu0.20.04.4))
+Type "help" for help.
+
+postgres=# -- Вариант 1: PK в определении столбца
+postgres=# CREATE TABLE students1 (
+postgres(#     student_id INT PRIMARY KEY,
+postgres(#     name VARCHAR(100),
+postgres(#     email VARCHAR(150)
+postgres(# );
+CREATE TABLE
+postgres=# 
+postgres=# -- Вариант 2: PK на уровне таблицы
+postgres=# CREATE TABLE students2 (
+postgres(#     student_id INT,
+postgres(#     name VARCHAR(100),
+postgres(#     email VARCHAR(150),
+postgres(#     PRIMARY KEY (student_id)
+postgres(# );
+CREATE TABLE
+postgres=# 
+postgres=# -- Вариант 3: Именованный констрейнт
+postgres=# CREATE TABLE students3 (
+postgres(#     student_id INT,
+postgres(#     name VARCHAR(100),
+postgres(#     email VARCHAR(150),
+postgres(#     CONSTRAINT pk_students3 PRIMARY KEY (student_id)
+postgres(# );
+CREATE TABLE
+postgres=# CREATE TABLE students4 (
+postgres(#     student_id INT,
+postgres(#     name VARCHAR(100),
+postgres(#     email VARCHAR(150)
+postgres(# );
+CREATE TABLE
+postgres=# 
+postgres=# ALTER TABLE students4
+postgres-# ADD CONSTRAINT pk_students4 PRIMARY KEY (student_id);
+ALTER TABLE
+postgres=# -- SERIAL
+postgres=# CREATE TABLE products (
+postgres(#     product_id SERIAL PRIMARY KEY,
+postgres(#     product_name VARCHAR(100),
+postgres(#     price DECIMAL(10,2)
+postgres(# );
+CREATE TABLE
+postgres=# 
+postgres=# INSERT INTO products (product_name, price) VALUES
+postgres-# ('Phone', 250.00),
+postgres-# ('Laptop', 900.00),
+postgres-# ('Tablet', 400.00);
+INSERT 0 3
+postgres=# 
+postgres=# SELECT * FROM products;
+ product_id | product_name | price  
+------------+--------------+--------
+          1 | Phone        | 250.00
+          2 | Laptop       | 900.00
+          3 | Tablet       | 400.00
+(3 rows)
+
+postgres=# 
+postgres=# -- IDENTITY (современный вариант)
+postgres=# CREATE TABLE orders (
+postgres(#     order_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+postgres(#     customer_name VARCHAR(100)
+postgres(# );
+CREATE TABLE
+postgres=# 
+postgres=# INSERT INTO orders (customer_name) VALUES
+postgres-# ('Alice'),
+postgres-# ('Bob'),
+postgres-# ('Charlie');
+INSERT 0 3
+postgres=# 
+postgres=# SELECT * FROM orders;
+ order_id | customer_name 
+----------+---------------
+        1 | Alice
+        2 | Bob
+        3 | Charlie
+(3 rows)
+
+postgres=# CREATE TABLE course_enrollments (
+postgres(#     student_id INT,
+postgres(#     course_id INT,
+postgres(#     semester VARCHAR(20),
+postgres(#     grade CHAR(2),
+postgres(#     PRIMARY KEY (student_id, course_id, semester)
+postgres(# );
+CREATE TABLE
+postgres=# 
+postgres=# -- Корректные вставки
+postgres=# INSERT INTO course_enrollments VALUES
+postgres-# (1, 101, '2024-Spring', 'A'),
+postgres-# (1, 101, '2024-Fall', 'A+');
+INSERT 0 2
+postgres=# 
+postgres=# -- дубликат → ошибка
+postgres=# INSERT INTO course_enrollments VALUES
+postgres-# (1, 101, '2024-Fall', 'B');
+ERROR:  duplicate key value violates unique constraint "course_enrollments_pkey"
+DETAIL:  Key (student_id, course_id, semester)=(1, 101, 2024-Fall) already exists.
+postgres=# -- NULL в PK → ошибка
+postgres=# INSERT INTO students1 (student_id, name, email)
+postgres-# VALUES (NULL, 'Test', 'test@example.com');
+ERROR:  null value in column "student_id" violates not-null constraint
+DETAIL:  Failing row contains (null, Test, test@example.com).
+postgres=# 
+postgres=# --дублирующий ключ → ошибка
+postgres=# INSERT INTO students1 VALUES (1, 'John', 'a@mail.com');
+INSERT 0 1
+postgres=# INSERT INTO students1 VALUES (1, 'Mike', 'b@mail.com');
+ERROR:  duplicate key value violates unique constraint "students1_pkey"
+DETAIL:  Key (student_id)=(1) already exists.
+postgres=# /q
+
