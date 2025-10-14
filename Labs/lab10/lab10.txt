@@ -1,0 +1,73 @@
+serdar@vostro:~$ sudo -i -u postgres
+postgres@vostro:~$ psql
+psql (12.22 (Ubuntu 12.22-0ubuntu0.20.04.4))
+Type "help" for help.
+
+postgres=# CREATE DATABASE lab10;
+CREATE DATABASE
+postgres=# \c lab10
+You are now connected to database "lab10" as user "postgres".
+lab10=# \i 
+\i: missing required argument
+lab10=# \i '/home/serdar/Database/Labs/lab09/lab9.sql'
+/home/serdar/Database/Labs/lab09/lab9.sql: No such file or directory
+lab10=# \i '/home/serdar/Database/Labs/lab09/lab09.sql'
+psql:/home/serdar/Database/Labs/lab09/lab09.sql:1: NOTICE:  table "loan" does not exist, skipping
+DROP TABLE
+psql:/home/serdar/Database/Labs/lab09/lab09.sql:2: NOTICE:  table "bookauthor" does not exist, skipping
+DROP TABLE
+psql:/home/serdar/Database/Labs/lab09/lab09.sql:3: NOTICE:  table "member" does not exist, skipping
+DROP TABLE
+psql:/home/serdar/Database/Labs/lab09/lab09.sql:4: NOTICE:  table "book" does not exist, skipping
+DROP TABLE
+psql:/home/serdar/Database/Labs/lab09/lab09.sql:5: NOTICE:  table "author" does not exist, skipping
+DROP TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+INSERT 0 3
+INSERT 0 3
+INSERT 0 2
+INSERT 0 3
+INSERT 0 2
+                  title                   |      author       
+------------------------------------------+-------------------
+ Harry Potter and the Philosopher's Stone | J.K. Rowling
+ War and Peace                            | Leo Tolstoy
+ Crime and Punishment                     | Fyodor Dostoevsky
+(3 rows)
+
+    member    |                  title                   |  loandate  |  fee  
+--------------+------------------------------------------+------------+-------
+ Ivan Ivanov  | Harry Potter and the Philosopher's Stone | 2025-10-01 |  0.00
+ Anna Petrova | War and Peace                            | 2025-09-20 | 15.50
+(2 rows)
+
+     name     |     title     |  fee  
+--------------+---------------+-------
+ Anna Petrova | War and Peace | 15.50
+(1 row)
+
+lab10=# \dt
+           List of relations
+ Schema |    Name    | Type  |  Owner   
+--------+------------+-------+----------
+ public | author     | table | postgres
+ public | book       | table | postgres
+ public | bookauthor | table | postgres
+ public | loan       | table | postgres
+ public | member     | table | postgres
+(5 rows)
+
+lab10=# \d book
+
+[1]+  Stopped                 psql
+postgres@vostro:~$ exit
+logout
+There are stopped jobs.
+postgres@vostro:~$ exit
+logout
+serdar@vostro:~$ 
+
