@@ -1,0 +1,173 @@
+serdar@vostro:~$ sudo -i -u postgres
+postgres@vostro:~$ psql
+psql (12.22 (Ubuntu 12.22-0ubuntu0.20.04.4))
+Type "help" for help.
+
+postgres=# CREATE DATABASE lab17;
+CREATE DATABASE
+postgres=# \c lab17;
+You are now connected to database "lab17" as user "postgres".
+lab17=# DROP TABLE IF EXISTS customers CASCADE;
+NOTICE:  table "customers" does not exist, skipping
+DROP TABLE
+lab17=# DROP TABLE IF EXISTS products CASCADE;
+NOTICE:  table "products" does not exist, skipping
+DROP TABLE
+lab17=# DROP TABLE IF EXISTS orders CASCADE;
+NOTICE:  table "orders" does not exist, skipping
+DROP TABLE
+lab17=# 
+lab17=# CREATE TABLE customers (
+lab17(#   customer_id SERIAL PRIMARY KEY,
+lab17(#   name  VARCHAR(100),
+lab17(#   email VARCHAR(100)
+lab17(# );
+CREATE TABLE
+lab17=# 
+lab17=# CREATE TABLE products (
+lab17(#   product_id SERIAL PRIMARY KEY,
+lab17(#   product_name VARCHAR(100),
+lab17(#   price NUMERIC(10,2)
+lab17(# );
+CREATE TABLE
+lab17=# 
+lab17=# CREATE TABLE orders (
+lab17(#   order_id SERIAL PRIMARY KEY,
+lab17(#   customer_id INT REFERENCES customers(customer_id),
+lab17(#   product_id INT REFERENCES products(product_id),
+lab17(#   quantity INT,
+lab17(#   order_date DATE DEFAULT CURRENT_DATE
+lab17(# );
+CREATE TABLE
+lab17=# 
+lab17=# INSERT INTO customers (name,email) VALUES
+lab17-# ('Aibek','aibek@example.com'),
+lab17-# ('Ainura','ainura@example.com'),
+lab17-# ('Bakyt','bakyt@example.com');
+INSERT 0 3
+lab17=# 
+lab17=# INSERT INTO products (product_name,price) VALUES
+lab17-# ('Laptop',1200.00),('Mouse',25.00),('Keyboard',45.00);
+INSERT 0 3
+lab17=# 
+lab17=# INSERT INTO orders (customer_id,product_id,quantity,order_date) VALUES
+lab17-# (1,1,1,'2024-02-15'),
+lab17-# (2,3,2,'2024-03-10'),
+lab17-# (3,2,3,'2024-03-12');
+INSERT 0 3
+lab17=# SELECT * FROM customers;
+ customer_id |  name  |       email        
+-------------+--------+--------------------
+           1 | Aibek  | aibek@example.com
+           2 | Ainura | ainura@example.com
+           3 | Bakyt  | bakyt@example.com
+(3 rows)
+
+lab17=# SELECT * FROM products
+lab17-# SELECT * FROM orders
+lab17-# COPY customers TO '/tmp/customers.csv' WITH CSV HEADER;
+ERROR:  syntax error at or near "SELECT"
+LINE 2: SELECT * FROM orders
+        ^
+lab17=# SELECT * FROM products;
+ product_id | product_name |  price  
+------------+--------------+---------
+          1 | Laptop       | 1200.00
+          2 | Mouse        |   25.00
+          3 | Keyboard     |   45.00
+(3 rows)
+
+lab17=# SELECT * FROM orders;
+ order_id | customer_id | product_id | quantity | order_date 
+----------+-------------+------------+----------+------------
+        1 |           1 |          1 |        1 | 2024-02-15
+        2 |           2 |          3 |        2 | 2024-03-10
+        3 |           3 |          2 |        3 | 2024-03-12
+(3 rows)
+
+lab17=# COPY customers TO '/tmp/customers.csv' WITH CSV HEADER;
+COPY 3
+lab17=# TRUNCATE customers;
+ERROR:  cannot truncate a table referenced in a foreign key constraint
+DETAIL:  Table "orders" references "customers".
+HINT:  Truncate table "orders" at the same time, or use TRUNCATE ... CASCADE.
+lab17=# TRUNCATE customers;
+ERROR:  cannot truncate a table referenced in a foreign key constraint
+DETAIL:  Table "orders" references "customers".
+HINT:  Truncate table "orders" at the same time, or use TRUNCATE ... CASCADE.
+lab17=# COPY customers FROM '/tmp/customers.csv' WITH CSV HEADER;
+ERROR:  duplicate key value violates unique constraint "customers_pkey"
+DETAIL:  Key (customer_id)=(1) already exists.
+CONTEXT:  COPY customers, line 2
+lab17=# SELECT * FROM customers;
+ customer_id |  name  |       email        
+-------------+--------+--------------------
+           1 | Aibek  | aibek@example.com
+           2 | Ainura | ainura@example.com
+           3 | Bakyt  | bakyt@example.com
+(3 rows)
+
+lab17=# COPY (
+lab17(#   SELECT name, email
+lab17(#   FROM customers
+lab17(#   WHERE name LIKE 'A%'
+lab17(# ) TO '/tmp/a_customers.csv' WITH CSV HEADER;
+COPY 2
+lab17=# COPY products TO '/tmp/products_pipe.txt'
+lab17-# WITH CSV HEADER DELIMITER '|' NULL 'N/A';
+COPY 3
+lab17=# TRUNCATE products;
+ERROR:  cannot truncate a table referenced in a foreign key constraint
+DETAIL:  Table "orders" references "products".
+HINT:  Truncate table "orders" at the same time, or use TRUNCATE ... CASCADE.
+lab17=# COPY products(product_name, price)
+lab17-# FROM '/tmp/products_pipe.txt'
+lab17-# WITH CSV HEADER DELIMITER '|';
+ERROR:  extra data after last expected column
+CONTEXT:  COPY products, line 2: "1|Laptop|1200.00"
+lab17=# SELECT * FROM products;
+ product_id | product_name |  price  
+------------+--------------+---------
+          1 | Laptop       | 1200.00
+          2 | Mouse        |   25.00
+          3 | Keyboard     |   45.00
+(3 rows)
+
+lab17=# \copy customers TO '/home/serdar/Database/Labs/lab17/customers_local.csv' WITH CSV HEADER
+/home/serdar/Database/Labs/lab17/customers_local.csv: Permission denied
+lab17=# \copy customers FROM '/home/serdar/Database/Labs/lab17/customers_local.csv' WITH CSV HEADER
+/home/serdar/Database/Labs/lab17/customers_local.csv: No such file or directory
+lab17=# \q
+postgres@vostro:~$ sudo -i -u postgres
+postgres is not in the sudoers file.  This incident will be reported.
+postgres@vostro:~$ pg_dump -d lab17 -Fc > /tmp/lab17.dump
+postgres@vostro:~$ createdb lab17_restore
+postgres@vostro:~$ pg_restore -d lab17_restore /tmp/lab17.dump
+postgres@vostro:~$ psql -d lab17_restore -c "SELECT COUNT(*) FROM customers;"
+ count 
+-------
+     3
+(1 row)
+
+postgres@vostro:~$ psql -d lab17
+psql (12.22 (Ubuntu 12.22-0ubuntu0.20.04.4))
+Type "help" for help.
+
+lab17=# CREATE TABLE IF NOT EXISTS staging_orders AS SELECT * FROM orders WHERE 1=0;
+SELECT 0
+lab17=# 
+lab17=# COPY (
+lab17(#   SELECT * FROM orders ORDER BY order_id LIMIT 5
+lab17(# ) TO '/tmp/orders_batch.csv' WITH CSV HEADER;
+COPY 3
+lab17=# 
+lab17=# COPY staging_orders FROM '/tmp/orders_batch.csv' WITH CSV HEADER;
+COPY 3
+lab17=# 
+lab17=# SELECT COUNT(*) FROM staging_orders;
+ count 
+-------
+     3
+(1 row)
+
+lab17=# 
