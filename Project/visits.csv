@@ -1,0 +1,4 @@
+visit_id,patient_id,doctor_id,visit_date,diagnosis,price
+1,1,1,2025-12-01 10:00,Flu,1500
+2,1,2,2025-12-03 12:30,Chest pain,2500
+3,2,1,2025-12-05 09:00,Cold,1200

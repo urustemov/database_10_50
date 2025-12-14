@@ -1,0 +1,5 @@
+DROP SCHEMA IF EXISTS clinic CASCADE;
+CREATE SCHEMA clinic;
+SET search_path TO clinic;
+
+ROLLBACK;

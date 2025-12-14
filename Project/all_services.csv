@@ -1,0 +1,4 @@
+visit_id,patient_name,doctor_name,visit_date,diagnosis,price
+1,Anna Petrova,Aibek Kadyrov,2025-12-01 10:00,Flu,1500
+2,Anna Petrova,Dana Sadykova,2025-12-03 12:30,Chest pain,2500
+3,Sergey Ivanov,Aibek Kadyrov,2025-12-05 09:00,Cold,1200
